@@ -16,6 +16,23 @@
     align-items: center;
 }
 
+.settings-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    background-color: hsl(0, 0%, 95%);
+}
+
+.button-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
 .button {
     display: inline-flex;
     align-items: center;
@@ -40,19 +57,6 @@ label {
     margin-left: 1rem;
 }
 
-.mt-1 {
-    margin-top: 1rem;
-}
-
-.py-1 {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-}
-
-.bg-gray {
-    background-color: hsl(0, 0%, 95%);
-}
-
 .bg-green {
     background-color: hsl(80, 45%, 65%);
 }
@@ -75,7 +79,6 @@ label {
 
 /* Maze */
 .container {
-    margin-top: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
