@@ -1,12 +1,23 @@
 window.onload = () => init();
 
-function init () {
-  const DEBUG = false;
-  const SIZE = 10;
-  const WALL_SATURATION = 20;
+const DEBUG = false;
+const SIZE = 10;
+const WALL_SATURATION = 30;
 
-  const grid = generateGrid(SIZE);
-  const ref = document.getElementById('grid');
+let grid;
+let ref;
+
+let start;
+let end;
+let current;
+
+let walls;
+let visited;
+let stack;
+
+function init () {
+  grid = generateGrid(SIZE);
+  ref = document.getElementById('grid');
 
   for (const [i, row] of Object.entries(grid)) {
     const el = ref.appendChild(createEl('div', { className: 'row' }, ''));
@@ -20,20 +31,49 @@ function init () {
     }
   }
 
-  const start = getRandomStartPoint(SIZE);
-  const end = getRandomEndPoint(SIZE);
-  const walls = generateWalls(SIZE, WALL_SATURATION, start, end);
+  start = getRandomStartPoint(SIZE);
+  current = start;
+  end = getRandomEndPoint(SIZE);
+  walls = generateWalls(SIZE, WALL_SATURATION, start, end);
+  stack = [start];
+  visited = [start];
 
   paint(ref, start, end, walls);
 }
 
-function generateGrid (m) {
+function move () {
+  console.log(stack);
+
+  let adv = advance(current, SIZE, walls, visited);
+
+  if (adv) {
+    let [nr, nc] = adv;
+    ref.childNodes[current[0]].childNodes[current[1]].classList.replace('current', 'visited');
+    current = adv;
+    stack.push(adv);
+    visited.push(adv);
+
+    ref.childNodes[nr].childNodes[nc].classList.add('current');
+
+    // setTimeout(() => {
+    //   ref.childNodes[nr].childNodes[nc].classList.add('current');
+    // }, 500);
+  } else if (stack.length > 0) {
+    ref.childNodes[current[0]].childNodes[current[1]].classList.replace('current', 'visited');
+    current = stack.pop();
+    ref.childNodes[current[0]].childNodes[current[1]].classList.replace('visited', 'current');
+  } else {
+    console.log('gg');
+  }
+}
+
+function generateGrid (size) {
   const grid = [];
 
-  for (let row = 0; row < m; row++) {
+  for (let row = 0; row < size; row++) {
     grid.push([]);
 
-    for (let col = 0; col < m; col++) {
+    for (let col = 0; col < size; col++) {
       grid[row].push(col);
     }
   }
@@ -75,7 +115,9 @@ function advance (point, size, walls, visited) {
 
   for (let i = 0; i < 4; i++) {
     let rr = r + dr[i];
-    let cc = c + dr[i];
+    let cc = c + dc[i];
+    let isWall = false;
+    let isVisited = false;
 
     // check bounds
     if (rr < 0 || cc < 0 || rr >= size || cc >= size) {
@@ -83,15 +125,29 @@ function advance (point, size, walls, visited) {
     }
 
     // check walls
-    if (walls.has(rr + '' + cc)) {
-      continue;
+    for (const [row, col] of walls) {
+      if (rr === row && cc === col) {
+        isWall = true;
+        break;
+      }
     }
 
     // check explored
-    if (visited.has(rr + '' + cc)) {
+    for (const [row, col] of visited) {
+      if (rr === row && cc === col) {
+        isVisited = true;
+        break;
+      }
+    }
+
+    if (isWall || isVisited) {
       continue;
     }
+
+    return [rr, cc];
   }
+
+  return null;
 }
 
 function createEl (tag, attributes = {}, text) {
