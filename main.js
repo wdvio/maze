@@ -1,18 +1,22 @@
 window.onload = () => init();
 
-const speedInput = document.getElementById("qwe123");
-const sizeInput = document.getElementById("asd123");
-const wallSaturationInput = document.getElementById("xxz123");
+const speedInput = document.getElementById('c1ff312f-ff79-43b8-8b42-4b503c44ff07');
+const sizeInput = document.getElementById('38e1e422-4904-40be-af57-9d66f6e64ff2');
+const wallSaturationInput = document.getElementById('5d634d76-6797-48c5-8945-84b17b41523a');
 
-let SIZE;
-let SPEED;
+const refBacktracking = document.getElementById('e9376c88-483f-4117-9152-8cbdeb4be6c5');
+
+const refRunButton = document.getElementById('9df5600b-6754-4fd3-a506-a2796c251ccc');
+
+const refGrid = document.getElementById('ae01c4af-9296-4976-9a53-c7b881ebd683');
+
+let size;
+let speed;
 
 let isDone;
 let isRunning;
 
 let grid;
-let ref = document.getElementById('grid');
-let runButton = document.getElementById('zxc123');
 
 let start;
 let end;
@@ -23,116 +27,36 @@ let visited;
 let stack;
 
 function init () {
-  SPEED = speedInput.value;
-  SIZE = sizeInput.value;
+  refGrid.innerHTML = null;
+
+  speed = speedInput.value;
+  size = sizeInput.value;
+
   isDone = false;
   isRunning = false;
+
   updateRunButton();
-  ref.innerHTML = '';
-  grid = generateGrid(SIZE);
 
-  for (const [i, row] of Object.entries(grid)) {
-    const el = ref.appendChild(createEl('div', { className: 'row' }, ''));
+  grid = [];
+  for (let row = 0; row < size; row++) {
+    grid.push([]);
+    const el = refGrid.appendChild(createEl('div', { className: 'row' }, ''));
 
-    for (const col of row) {
+    for (let col = 0; col < size; col++) {
+      grid[row].push(col);
       el.appendChild(createEl('div', { className: 'node' }, ''));
     }
   }
 
-  start = getRandomStartPoint(SIZE);
+  start = getRandomStartPoint(size);
+  end = getRandomEndPoint(size);
+  walls = generateWalls(size, wallSaturationInput.value, start, end);
+
   current = start;
-  end = getRandomEndPoint(SIZE);
   stack = [start];
   visited = [start];
-  walls = generateWalls(SIZE, wallSaturationInput.value, start, end);
 
-
-  paint(ref, start, end, walls);
-}
-
-function run () {
-  if (! isDone) {
-    isRunning = ! isRunning;
-    updateRunButton();
-    move();
-  }
-}
-
-function updateRunButton () {
-  runButton.innerText = isRunning ? '\u25A0' : '\u21E2';
-  if (isRunning) {
-    runButton.classList.replace('bg-green', 'bg-red')
-  } else {
-    runButton.classList.replace('bg-red', 'bg-green')
-  }
-}
-
-function move () {
-  if (isRunning && ! isDone) {
-    let adv = advance(current, SIZE, walls, visited);
-
-    if (adv) {
-      let [nr, nc] = adv;
-      ref.childNodes[current[0]].childNodes[current[1]].classList.replace('current', 'visited');
-      current = adv;
-      stack.push(adv);
-      visited.push(adv);
-
-      if (nr === end[0] && nc === end[1]) {
-        // PATH HAS BEEN FOUND!
-
-        ref.childNodes[current[0]].childNodes[current[1]].classList.replace('end', 'start');
-
-        // for (const item of stack) {
-        //   ref.childNodes[item[0]].childNodes[item[1]].classList.replace('visited', 'path');
-        // }
-
-        isDone = true;
-        isRunning = false;
-        updateRunButton();
-      } else {
-        ref.childNodes[nr].childNodes[nc].classList.add('current');
-
-        // move();
-        setTimeout(() => move(), SPEED);
-      }
-    } else if (stack.length > 0) {
-      ref.childNodes[current[0]].childNodes[current[1]].classList.replace('current', 'visited');
-      current = stack.pop();
-
-      // Getting back to checkpoints is too slow
-      // ref.childNodes[current[0]].childNodes[current[1]].classList.replace('visited', 'current');
-      // setTimeout(() => move(), SPEED);
-
-      move();
-    } else {
-      isDone = true;
-      isRunning = false;
-      updateRunButton();
-    }
-  }
-}
-
-function generateGrid (size) {
-  const grid = [];
-
-  for (let row = 0; row < size; row++) {
-    grid.push([]);
-
-    for (let col = 0; col < size; col++) {
-      grid[row].push(col);
-    }
-  }
-
-  return grid;
-}
-
-function getRandomStartPoint (size) {
-  return [0, Math.floor(Math.random(0, 1) * size)];
-}
-
-function getRandomEndPoint (size) {
-  return [size - 1, Math.floor(Math.random(0, 1) * size)];
+  paint(refGrid, start, end, walls);
 }
 
 function generateWalls (size, saturation, start, end) {
@@ -153,50 +77,115 @@ function generateWalls (size, saturation, start, end) {
   return arr;
 }
 
+function run () {
+  if (! isDone) {
+    isRunning = ! isRunning;
+    updateRunButton();
+    move();
+  }
+}
+
+function updateRunButton () {
+  if (isRunning) {
+    refRunButton.innerText = '\u25A0';
+    refRunButton.classList.replace('bg-green', 'bg-red')
+  } else {
+    refRunButton.innerText = '\u21E2';
+    refRunButton.classList.replace('bg-red', 'bg-green')
+  }
+}
+
+function move () {
+  if (isRunning && ! isDone) {
+    let adv = advance(current, size, walls, visited);
+
+    if (adv) {
+      let [newRow, newCol] = adv;
+      refGrid.childNodes[current[0]].childNodes[current[1]].classList.replace('current', 'visited');
+      stack.push(current);
+      current = adv;
+      visited.push(adv);
+
+      if (newRow === end[0] && newCol === end[1]) {
+        refGrid.childNodes[current[0]].childNodes[current[1]].classList.replace('end', 'start');
+
+        finished();
+      } else {
+        refGrid.childNodes[newRow].childNodes[newCol].classList.add('current');
+
+        setTimeout(() => move(), speed);
+      }
+    } else if (stack.length > 0) {
+      refGrid.childNodes[current[0]].childNodes[current[1]].classList.replace('current', 'visited');
+      current = stack.pop();
+
+      if (refBacktracking.checked) {
+        refGrid.childNodes[current[0]].childNodes[current[1]].classList.replace('visited', 'current');
+        setTimeout(() => move(), speed);
+      } else {
+        move();
+      }
+    } else {
+      finished();
+    }
+  }
+}
+
+function finished () {
+  isDone = true;
+  isRunning = false;
+  updateRunButton();
+}
+
+function getRandomStartPoint (size) {
+  return [0, Math.floor(Math.random(0, 1) * size)];
+}
+
+function getRandomEndPoint (size) {
+  return [size - 1, Math.floor(Math.random(0, 1) * size)];
+}
+
 function advance (point, size, walls, visited) {
   const [r, c] = point;
 
-  const dr = [-1, 0, 1, 0];
-  const dc = [0, 1, 0, -1];
-
   for (let i = 0; i < 4; i++) {
-    let rr = r + dr[i];
-    let cc = c + dc[i];
-    let isWall = false;
-    let isVisited = false;
+    let problems = 0;
+
+    // ^, >, v, <
+    let newRow = r + [-1, 0, 1, 0][i];
+    let newCol = c + [0, 1, 0, -1][i];
 
     // check bounds
-    if (rr < 0 || cc < 0 || rr >= size || cc >= size) {
+    if (newRow < 0 || newCol < 0 || newRow >= size || newCol >= size) {
       continue;
     }
 
     // check walls
     for (const [row, col] of walls) {
-      if (rr === row && cc === col) {
-        isWall = true;
+      if (newRow === row && newCol === col) {
+        problems++;
         break;
       }
     }
 
-    // check explored
+    // check visited
     for (const [row, col] of visited) {
-      if (rr === row && cc === col) {
-        isVisited = true;
+      if (newRow === row && newCol === col) {
+        problems++;
         break;
       }
     }
 
-    if (isWall || isVisited) {
+    if (problems > 0) {
       continue;
     }
 
-    return [rr, cc];
+    return [newRow, newCol];
   }
 
   return null;
 }
 
-// Paints start point, end point, and walls
 function paint (ref, start, end, walls) {
   ref.childNodes[start[0]].childNodes[start[1]].classList.add('start');
   ref.childNodes[end[0]].childNodes[end[1]].classList.add('end');
@@ -204,17 +193,4 @@ function paint (ref, start, end, walls) {
   for (const [row, col] of walls) {
     ref.childNodes[row].childNodes[col].classList.add('wall');
   }
-}
-
-// Helper: renders DOM elements
-function createEl (tag, attributes = {}, text) {
-  const el = document.createElement(tag);
-
-  Object.assign(el, attributes);
-
-  if (text) {
-    el.appendChild(document.createTextNode(text));
-  }
-
-  return el;
 }
