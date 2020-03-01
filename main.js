@@ -1,23 +1,34 @@
 window.onload = () => init();
 
 function init () {
-  const m = 10;
-  const grid = generateGrid(m);
+  const DEBUG = false;
+  const SIZE = 10;
+  const WALL_SATURATION = 10;
+
+  const grid = generateGrid(SIZE);
   const ref = document.getElementById('grid');
 
   for (const [i, row] of Object.entries(grid)) {
     const el = ref.appendChild(createEl('div', { className: 'row' }, ''));
 
     for (const col of row) {
-      el.appendChild(createEl('div', { className: 'node' }, ''));
-      // el.appendChild(createEl('div', { className: 'node' }, `${i},${col}`));
+      if (DEBUG) {
+        el.appendChild(createEl('div', { className: 'node' }, `${i},${col}`));
+      } else {
+        el.appendChild(createEl('div', { className: 'node' }, ''));
+      }
     }
   }
 
-  const start = getRandomStartPoint(m);
-  const end = getRandomEndPoint(m);
-  console.log(start, end);
-  const walls = generateWalls(m);
+  const start = getRandomStartPoint(SIZE);
+  const end = getRandomEndPoint(SIZE);
+  const walls = generateWalls(SIZE, WALL_SATURATION);
+
+  console.log(walls);
+
+  // Removes walls at start/end points
+  // walls[start[0]][start[1]] = false;
+  // walls[end[0]][end[1]] = false;
 
   paint(ref, start, end, walls);
 }
@@ -36,26 +47,53 @@ function generateGrid (m) {
   return grid;
 }
 
-function getRandomStartPoint (m) {
-  return [0, Math.round(Math.random(0, 1) * m)];
+function getRandomStartPoint (size) {
+  return [0, Math.floor(Math.random(0, 1) * size)];
 }
 
-function getRandomEndPoint (m) {
-  return [9, Math.round(Math.random(0, 1) * m)];
+function getRandomEndPoint (size) {
+  return [size - 1, Math.floor(Math.random(0, 1) * size)];
 }
 
-function generateWalls (m) {
-  const grid = [];
+function generateWalls (size, saturation) {
+  const arr = [];
 
-  for (let row = 0; row < m; row++) {
-    grid.push([]);
-
-    for (let col = 0; col < m; col++) {
-      grid[row].push(Math.round(Math.random(0, 1) * 100) > 75);
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      if (Math.round(Math.random(0, 1) * 100) < saturation) {
+        arr.push([row, col]);
+      }
     }
   }
 
-  return grid;
+  return arr;
+}
+
+function advance (point, size, walls, visited) {
+  const [r, c] = point;
+
+  const dr = [-1, 0, 1, 0];
+  const dc = [0, 1, 0, -1];
+
+  for (let i = 0; i < 4; i++) {
+    let rr = r + dr[i];
+    let cc = c + dr[i];
+
+    // check bounds
+    if (rr < 0 || cc < 0 || rr >= size || cc >= size) {
+      continue;
+    }
+
+    // check walls
+    if (walls.has(rr + '' + cc)) {
+      continue;
+    }
+
+    // check explored
+    if (visited.has(rr + '' + cc)) {
+      continue;
+    }
+  }
 }
 
 function createEl (tag, attributes = {}, text) {
