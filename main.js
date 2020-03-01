@@ -59,52 +59,16 @@ function init () {
   paint(refGrid, start, end, walls);
 }
 
-function generateWalls (size, saturation, start, end) {
-  const arr = [];
-
-  for (let row = 0; row < size; row++) {
-    for (let col = 0; col < size; col++) {
-      if (Math.round(Math.random(0, 1) * 100) < saturation) {
-        if (start[0] !== row || start[1] !== col) {
-          if (end[0] !== row || end[1] !== col) {
-            arr.push([row, col]);
-          }
-        }
-      }
-    }
-  }
-
-  return arr;
-}
-
-function run () {
-  if (! isDone) {
-    isRunning = ! isRunning;
-    updateRunButton();
-    move();
-  }
-}
-
-function updateRunButton () {
-  if (isRunning) {
-    refRunButton.innerText = '\u25A0';
-    refRunButton.classList.replace('bg-green', 'bg-red')
-  } else {
-    refRunButton.innerText = '\u21E2';
-    refRunButton.classList.replace('bg-red', 'bg-green')
-  }
-}
-
 function move () {
   if (isRunning && ! isDone) {
-    let adv = advance(current, size, walls, visited);
+    let nextVertex = getNextVertex(current, size, walls, visited);
 
-    if (adv) {
-      let [newRow, newCol] = adv;
+    if (nextVertex) {
+      let [newRow, newCol] = nextVertex;
       refGrid.childNodes[current[0]].childNodes[current[1]].classList.replace('current', 'visited');
       stack.push(current);
-      current = adv;
-      visited.push(adv);
+      current = nextVertex;
+      visited.push(nextVertex);
 
       if (newRow === end[0] && newCol === end[1]) {
         refGrid.childNodes[current[0]].childNodes[current[1]].classList.replace('end', 'start');
@@ -135,21 +99,15 @@ function move () {
   }
 }
 
-function finished () {
-  isDone = true;
-  isRunning = false;
-  updateRunButton();
-}
-
-function advance (point, size, walls, visited) {
-  const [r, c] = point;
+function getNextVertex (vertex, size, walls, visited) {
+  const [row, col] = vertex;
 
   for (let i = 0; i < 4; i++) {
     let problems = 0;
 
     // ^, >, v, <
-    let newRow = r + [-1, 0, 1, 0][i];
-    let newCol = c + [0, 1, 0, -1][i];
+    let newRow = row + [-1, 0, 1, 0][i];
+    let newCol = col + [0, 1, 0, -1][i];
 
     // check bounds
     if (newRow < 0 || newCol < 0 || newRow >= size || newCol >= size) {
@@ -180,6 +138,48 @@ function advance (point, size, walls, visited) {
   }
 
   return null;
+}
+
+function generateWalls (size, saturation, start, end) {
+  const arr = [];
+
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      if (Math.round(Math.random(0, 1) * 100) < saturation) {
+        if (start[0] !== row || start[1] !== col) {
+          if (end[0] !== row || end[1] !== col) {
+            arr.push([row, col]);
+          }
+        }
+      }
+    }
+  }
+
+  return arr;
+}
+
+function run () {
+  if (! isDone) {
+    isRunning = ! isRunning;
+    updateRunButton();
+    move();
+  }
+}
+
+function finished () {
+  isDone = true;
+  isRunning = false;
+  updateRunButton();
+}
+
+function updateRunButton () {
+  if (isRunning) {
+    refRunButton.innerText = '\u25A0';
+    refRunButton.classList.replace('bg-green', 'bg-red')
+  } else {
+    refRunButton.innerText = '\u21E2';
+    refRunButton.classList.replace('bg-red', 'bg-green')
+  }
 }
 
 function paint (ref, start, end, walls) {
