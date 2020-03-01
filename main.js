@@ -48,8 +48,8 @@ function init () {
     }
   }
 
-  start = getRandomStartPoint(size);
-  end = getRandomEndPoint(size);
+  start = [0, Math.floor(Math.random(0, 1) * size)];
+  end = [size - 1, Math.floor(Math.random(0, 1) * size)];
   walls = generateWalls(size, wallSaturationInput.value, start, end);
 
   current = start;
@@ -113,7 +113,11 @@ function move () {
       } else {
         refGrid.childNodes[newRow].childNodes[newCol].classList.add('current');
 
-        setTimeout(() => move(), speed);
+        if (speed == 0) {
+          move();
+        } else {
+          setTimeout(() => move(), speed);
+        }
       }
     } else if (stack.length > 0) {
       refGrid.childNodes[current[0]].childNodes[current[1]].classList.replace('current', 'visited');
@@ -135,14 +139,6 @@ function finished () {
   isDone = true;
   isRunning = false;
   updateRunButton();
-}
-
-function getRandomStartPoint (size) {
-  return [0, Math.floor(Math.random(0, 1) * size)];
-}
-
-function getRandomEndPoint (size) {
-  return [size - 1, Math.floor(Math.random(0, 1) * size)];
 }
 
 function advance (point, size, walls, visited) {
