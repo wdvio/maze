@@ -3,7 +3,7 @@ window.onload = () => init();
 function init () {
   const DEBUG = false;
   const SIZE = 10;
-  const WALL_SATURATION = 10;
+  const WALL_SATURATION = 20;
 
   const grid = generateGrid(SIZE);
   const ref = document.getElementById('grid');
@@ -22,13 +22,7 @@ function init () {
 
   const start = getRandomStartPoint(SIZE);
   const end = getRandomEndPoint(SIZE);
-  const walls = generateWalls(SIZE, WALL_SATURATION);
-
-  console.log(walls);
-
-  // Removes walls at start/end points
-  // walls[start[0]][start[1]] = false;
-  // walls[end[0]][end[1]] = false;
+  const walls = generateWalls(SIZE, WALL_SATURATION, start, end);
 
   paint(ref, start, end, walls);
 }
@@ -55,13 +49,17 @@ function getRandomEndPoint (size) {
   return [size - 1, Math.floor(Math.random(0, 1) * size)];
 }
 
-function generateWalls (size, saturation) {
+function generateWalls (size, saturation, start, end) {
   const arr = [];
 
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {
       if (Math.round(Math.random(0, 1) * 100) < saturation) {
-        arr.push([row, col]);
+        if (start[0] !== row || start[1] !== col) {
+          if (end[0] !== row || end[1] !== col) {
+            arr.push([row, col]);
+          }
+        }
       }
     }
   }
@@ -112,12 +110,8 @@ function paint (ref, start, end, walls) {
   ref.childNodes[start[0]].childNodes[start[1]].classList.add('start');
   ref.childNodes[end[0]].childNodes[end[1]].classList.add('end');
 
-  for (const [iRow, row] of Object.entries(walls)) {
-    for (const [iCol, col] of Object.entries(row)) {
-      if (col) {
-        ref.childNodes[iRow].childNodes[iCol].classList.add('wall');
-      }
-    }
+  for (const [row, col] of walls) {
+    ref.childNodes[row].childNodes[col].classList.add('wall');
   }
 
   // ref.childNodes[0].childNodes[2].classList.add('wall');
