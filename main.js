@@ -1,10 +1,11 @@
 window.onload = () => init();
 
-const sizeInput = document.getElementById("size");
-const wallSaturation = document.getElementById("wallSaturation");
+const speedInput = document.getElementById("qwe123");
+const sizeInput = document.getElementById("asd123");
+const wallSaturationInput = document.getElementById("xxz123");
 
 let SIZE;
-const SPEED = 0;
+let SPEED;
 
 let isDone;
 let isRunning;
@@ -22,6 +23,7 @@ let visited;
 let stack;
 
 function init () {
+  SPEED = speedInput.value;
   SIZE = sizeInput.value;
   isDone = false;
   isRunning = false;
@@ -42,7 +44,7 @@ function init () {
   end = getRandomEndPoint(SIZE);
   stack = [start];
   visited = [start];
-  walls = generateWalls(SIZE, wallSaturation.value, start, end);
+  walls = generateWalls(SIZE, wallSaturationInput.value, start, end);
 
 
   paint(ref, start, end, walls);
