@@ -6,7 +6,22 @@
 </head>
 <body>
 
-<button onclick="move()">Advance</button>
+<div class="section">
+    <p>Algorithm: Depth-First Search</p>
+</div>
+
+<div class="section bg-gray py-1">
+    <label for="size">Size: </label>
+    <input type="text" id="size" value="50">
+
+    <label for="wallSaturation">Wall Saturation: </label>
+    <input type="text" id="wallSaturation" value="30">
+</div>
+
+<div class="section mt-1">
+    <button class="button" onclick="init()">Generate</button>
+    <button id="zxc123" class="button bg-green" onclick="run()">Run</button>
+</div>
 
 <div class="container">
     <div id="grid" class="grid"></div>
