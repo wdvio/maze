@@ -1,8 +1,8 @@
-window.onload = () => init();
+window.onload = event => init(event);
 
-const speedInput = document.getElementById('c1ff312f-ff79-43b8-8b42-4b503c44ff07');
-const sizeInput = document.getElementById('38e1e422-4904-40be-af57-9d66f6e64ff2');
-const wallSaturationInput = document.getElementById('5d634d76-6797-48c5-8945-84b17b41523a');
+const refSpeedInput = document.getElementById('c1ff312f-ff79-43b8-8b42-4b503c44ff07');
+const refGridSizeInput = document.getElementById('38e1e422-4904-40be-af57-9d66f6e64ff2');
+const refWallSaturationInput = document.getElementById('5d634d76-6797-48c5-8945-84b17b41523a');
 
 const refBacktracking = document.getElementById('e9376c88-483f-4117-9152-8cbdeb4be6c5');
 
@@ -26,11 +26,17 @@ let walls;
 let visited;
 let stack;
 
-function init () {
+refSpeedInput.addEventListener('change', (event) => {
+  speed = event.target.value;
+});
+
+function init (e) {
+  e.preventDefault();
+
   refGrid.innerHTML = null;
 
-  speed = speedInput.value;
-  size = sizeInput.value;
+  speed = refSpeedInput.value;
+  size = refGridSizeInput.value;
 
   isDone = false;
   isRunning = false;
@@ -40,7 +46,7 @@ function init () {
   grid = [];
   for (let row = 0; row < size; row++) {
     grid.push([]);
-    const el = refGrid.appendChild(createEl('div', { className: 'row' }, ''));
+    const el = refGrid.appendChild(createEl('div', { className: 'flex justify-between' }, ''));
 
     for (let col = 0; col < size; col++) {
       grid[row].push(col);
@@ -50,7 +56,7 @@ function init () {
 
   start = [0, Math.floor(Math.random(0, 1) * size)];
   end = [size - 1, Math.floor(Math.random(0, 1) * size)];
-  walls = generateWalls(size, wallSaturationInput.value, start, end);
+  walls = generateWalls(size, refWallSaturationInput.value, start, end);
 
   current = start;
   stack = [start];
@@ -158,7 +164,9 @@ function generateWalls (size, saturation, start, end) {
   return arr;
 }
 
-function run () {
+function run (e) {
+  e.preventDefault();
+
   if (! isDone) {
     isRunning = ! isRunning;
     updateRunButton();
@@ -175,10 +183,10 @@ function finished () {
 function updateRunButton () {
   if (isRunning) {
     refRunButton.innerText = '\u25A0';
-    refRunButton.classList.replace('bg-green', 'bg-red')
+    refRunButton.classList.replace('bg-green-400', 'bg-red-600')
   } else {
     refRunButton.innerText = '\u21E2';
-    refRunButton.classList.replace('bg-red', 'bg-green')
+    refRunButton.classList.replace('bg-red-600', 'bg-green-400')
   }
 }
 

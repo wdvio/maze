@@ -1,39 +1,174 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Maze</title>
-    <link rel="stylesheet" href="style.css">
-    <meta name="author" content="Elvijs Ostrovskis">
+  <title>Traversal</title>
+  <meta name="author" content="Elvijs Ostrovskis">
+
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/ui@latest/dist/tailwind-ui.min.css">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
 </head>
 <body>
 
-<div class="section">
-    <p>Algorithm: Depth-First Search</p>
+<div class="min-h-screen bg-white">
+  <nav x-data="{ open: false }" class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex">
+          <div class="hidden sm:-my-px sm:ml-6 sm:flex">
+            <a href="#" class="inline-flex items-center px-1 pt-1 border-b-2 border-indigo-500 text-sm font-medium leading-5 text-gray-900 focus:outline-none focus:border-indigo-700 transition duration-150 ease-in-out">
+              Algorithms
+            </a>
+          </div>
+        </div>
+        <div class="-mr-2 flex items-center sm:hidden">
+          <button @click="open = !open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+            <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+              <path :class="{'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              <path :class="{'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div :class="{'block': open, 'hidden': !open}" class="hidden sm:hidden">
+      <div class="pt-2 pb-3">
+        <a href="#" class="block pl-3 pr-4 py-2 border-l-4 border-indigo-500 text-base font-medium text-indigo-700 bg-indigo-50 focus:outline-none focus:text-indigo-800 focus:bg-indigo-100 focus:border-indigo-700 transition duration-150 ease-in-out">Algorithm</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="py-10">
+    <header>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold leading-tighter uppercase">
+          Depth First Search
+        </h2>
+      </div>
+    </header>
+    <main>
+      <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+
+      <form>
+        <div>
+          <div>
+            <div class="mt-6 sm:mt-5">
+              <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                <label for="c1ff312f-ff79-43b8-8b42-4b503c44ff07" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                  Speed
+                </label>
+                <div class="mt-1 sm:mt-0 sm:col-span-2">
+                  <div class="max-w-xs rounded-md shadow-sm">
+                    <select id="c1ff312f-ff79-43b8-8b42-4b503c44ff07" class="block form-select w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5">
+                      <option value="0">Instant</option>
+                      <option value="25">Fast</option>
+                      <option value="200" selected>Normal</option>
+                      <option value="1000">Slow</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                <label for="38e1e422-4904-40be-af57-9d66f6e64ff2" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                  Grid Size
+                </label>
+                <div class="mt-1 sm:mt-0 sm:col-span-2">
+                  <div class="max-w-xs rounded-md shadow-sm">
+                    <input id="38e1e422-4904-40be-af57-9d66f6e64ff2" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" value="30" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 sm:mt-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5">
+                <label for="5d634d76-6797-48c5-8945-84b17b41523a" class="block text-sm font-medium leading-5 text-gray-700 sm:mt-px sm:pt-2">
+                  Wall Saturation
+                </label>
+                <div class="mt-1 sm:mt-0 sm:col-span-2">
+                  <div class="max-w-xs rounded-md shadow-sm">
+                    <input id="5d634d76-6797-48c5-8945-84b17b41523a" class="form-input block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" value="35" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 sm:mt-5">
+              <div class="sm:border-t sm:border-gray-200 sm:py-5">
+                <fieldset>
+                  <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-baseline">
+                    <div>
+                      <legend class="text-base leading-6 font-medium text-gray-900 sm:text-sm sm:leading-5 sm:text-gray-700">
+                        Options
+                      </legend>
+                    </div>
+                    <div class="mt-4 sm:mt-0 sm:col-span-2">
+                      <div class="max-w-lg">
+                        <div class="relative flex items-start">
+                          <div class="absolute flex items-center h-5">
+                            <input id="e9376c88-483f-4117-9152-8cbdeb4be6c5" type="checkbox" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out" />
+                          </div>
+                          <div class="pl-7 text-sm leading-5">
+                            <label for="e9376c88-483f-4117-9152-8cbdeb4be6c5" class="font-medium text-gray-700">Backtracking</label>
+                            <p class="text-gray-500">Shows backtracking process.</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        </div>
+
+          <div class="py-8 border-t border-gray-200">
+            <div class="flex justify-center">
+              <button onclick="init(event)" class="inline-flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded text-black bg-gray-100 hover:bg-gray-200 focus:outline-none focus:border-indigo-500 focus:shadow-outline-indigo active:bg-indigo-500 transition duration-150 ease-in-out">
+                Generate
+              </button>
+
+              <button onclick="run(event)" id="9df5600b-6754-4fd3-a506-a2796c251ccc" class="ml-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded text-white bg-green-400 hover:bg-black focus:outline-none focus:border-green-700 focus:shadow-outline-green active:bg-green-700">
+                Run
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="flex justify-center align-center">
+          <div id="ae01c4af-9296-4976-9a53-c7b881ebd683" class="inline-block shadow-lg"></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="bg-white">
+    <div class="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
+      <div class="flex justify-center md:order-2">
+        <a href="https://twitter.com/_0x29a" class="ml-6 text-gray-400 hover:text-gray-500">
+          <span class="sr-only">Twitter</span>
+          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
+          </svg>
+        </a>
+        <a href="https://github.com/wdvio" class="ml-6 text-gray-400 hover:text-gray-500">
+          <span class="sr-only">GitHub</span>
+          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"/>
+          </svg>
+        </a>
+      </div>
+      <div class="mt-8 md:mt-0 md:order-1">
+        <p class="text-center text-base leading-6 text-gray-400">
+          &copy; 2020 Elvijs Ostrovskis
+        </p>
+      </div>
+    </div>
+  </div>
 </div>
-
-<div class="settings-section bg-gray">
-    <label for="c1ff312f-ff79-43b8-8b42-4b503c44ff07">Speed (ms):</label>
-    <input type="text" id="c1ff312f-ff79-43b8-8b42-4b503c44ff07" value="25">
-
-    <label for="38e1e422-4904-40be-af57-9d66f6e64ff2">Size:</label>
-    <input type="text" id="38e1e422-4904-40be-af57-9d66f6e64ff2" value="30">
-
-    <label for="5d634d76-6797-48c5-8945-84b17b41523a">Wall Saturation:</label>
-    <input type="text" id="5d634d76-6797-48c5-8945-84b17b41523a" value="30">
-
-    <label for="e9376c88-483f-4117-9152-8cbdeb4be6c5">Show Backtracking:</label>
-    <input type="checkbox" id="e9376c88-483f-4117-9152-8cbdeb4be6c5" checked>
-</div>
-
-<div class="button-section">
-    <button class="button" onclick="init()">Generate</button>
-    <button id="9df5600b-6754-4fd3-a506-a2796c251ccc" class="button bg-green" onclick="run()">⇢</button>
-</div>
-
-<div class="container">
-    <div id="ae01c4af-9296-4976-9a53-c7b881ebd683" class="grid"></div>
-</div>
-
 
 <script src="helpers.js"></script>
 <script src="main.js"></script>
