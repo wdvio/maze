@@ -112,7 +112,6 @@ function move () {
   }
 
   if (stack.length === 0) {
-    restart();
     return;
   }
 
