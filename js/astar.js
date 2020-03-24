@@ -10,6 +10,7 @@ const n = 12;
 const saturation = 35;
 const grid = [];
 let walls = [];
+let distances = {};
 const start = {};
 const end = {};
 const current = {};
@@ -18,11 +19,16 @@ function restart () {
   renderGrid();
 
   walls = [];
+  distances = {};
 
   setRandomStartPoint();
   setCurrentPoint();
   setRandomEndPoint();
   generateWalls();
+
+  if (! distances.hasOwnProperty(toIndex(current.row, current.col))) {
+    distances[toIndex(current.row, current.col)] = calculateDistance(current.row, current.col, true);
+  }
 }
 
 function renderGrid () {
@@ -92,7 +98,55 @@ function generateWalls () {
 // }
 
 function move () {
-  console.log('hi :)');
+  for (let i = 0; i < 4; i++) {
+    const rr = current.row + [-1, 0, 1, 0][i];
+    const cc = current.col + [0, 1, 0, -1][i];
+
+    if (rr < 0 || cc < 0 || rr >= n || cc >= n) {
+      continue;
+    }
+
+    if (walls.includes(JSON.stringify([rr, cc]))) {
+      continue;
+    }
+
+    if (! distances.hasOwnProperty(toIndex(rr, cc))) {
+      distances[toIndex(rr, cc)] = calculateDistance(rr, cc);
+    }
+  }
+
+  let min = Infinity;
+  for (const [_, distance] of Object.entries(distances)) {
+    if (! distance.v) {
+      if (distance.f < min) {
+        min = distance.f;
+      }
+    }
+  }
+
+  const arr = [];
+  for (const [_, distance] of Object.entries(distances)) {
+    if (! distance.v && distance.f === min) {
+      arr.push({ _: distance });
+    }
+  }
+
+  console.log(arr);
+}
+
+function calculateDistance (r, c, v = false) {
+  const g = Math.abs(start.row - r) + Math.abs(start.col - c);
+  const h = Math.abs(end.row - r) + Math.abs(end.col - c);
+
+  return { g, h, f: g + h, v };
+}
+
+function toIndex (r, c) {
+  return (n * r) + c;
+}
+
+function toCoordinates (i) {
+  return [Math.floor(i / n), i % n];
 }
 
 function bindKeys () {
