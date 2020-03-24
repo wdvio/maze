@@ -97,9 +97,7 @@ function move () {
     }
   }
 
-  const next = distances
-    .filter(d => ! d.v)
-    .sort((a, b) => a.f - b.f || a.h - b.h)[0];
+  const next = distances.filter(d => ! d.v).sort((a, b) => a.h - b.h)[0];
 
   if (! next) {
     restart();
