@@ -97,15 +97,16 @@ function move () {
     }
   }
 
-  if (current.row === end.row && current.col === end.col) {
-    console.log(distances);
+  const next = distances
+    .filter(d => ! d.v)
+    .sort((a, b) => a.f - b.f || a.h - b.h)[0];
+
+  if (! next) {
     restart();
     return;
   }
 
-  const next = distances.filter(d => ! d.v).sort((a, b) => a.f - b.f)[0];
-
-  if (! next) {
+  if (next.r === end.row && next.c === end.col) {
     restart();
     return;
   }
