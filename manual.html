@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>vsn.ai - A*</title>
+  <title>vsn.ai - Manual</title>
   <meta name="author" content="Elvijs Ostrovskis">
 
   <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
@@ -17,10 +17,11 @@
 
         <div class="z-10 flex flex-col overflow-hidden justify-between h-screen w-64 bg-gray-100 border-l">
             <div class="flex flex-col">
-                <a class="mt-4 text-gray-500 hover:text-black text-sm px-4 py-2" href="index.html">Manual</a>
+                <a class="mt-4 text-gray-800 hover:text-black text-sm px-4 py-2 bg-gray-200" href="index.html">Manual</a>
                 <a class="text-gray-500 hover:text-black text-sm px-4 py-2" href="bfs.html">Breadth-First Search</a>
                 <a class="text-gray-500 hover:text-black text-sm px-4 py-2" href="dfs.html">Depth-First Search</a>
-                <a class="text-gray-800 hover:text-black text-sm px-4 py-2 bg-gray-200" href="astar.html">A*</a>
+                <a class="text-gray-500 hover:text-black text-sm px-4 py-2" href="dijkstra.html">Dijkstra</a>
+                <a class="text-gray-500 hover:text-black text-sm px-4 py-2" href="astar.html">A*</a>
             </div>
 
             <div class="flex justify-between mx-8 mb-4">
@@ -33,10 +34,10 @@
 
     <div class="flex justify-center absolute bottom-0 w-full">
         <div class="text-sm bg-gray-800 text-white mb-16 px-8 py-4 shadow-lg rounded">
-            Press <span class="font-bold">SPACE</span> to advance, <span class="font-bold">R</span> to restart
+            Use <span class="font-bold">arrow</span> or <span class="font-bold">WASD</span> keys to navigate, <span class="font-bold">R</span> to restart
         </div>
     </div>
 
-    <script src="js/astar.js"></script>
+    <script src="js/manual.js"></script>
 </body>
 </html>
