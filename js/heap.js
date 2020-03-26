@@ -8,7 +8,7 @@ class Heap {
     let par = Math.floor((i - 1) / 2);
 
     while (i > 0 && this.heap[i].f < this.heap[par].f) {
-      this.swap(i, ((i + 1) >> 1) - 1);
+      this.swap(i, par);
       i = par;
       par = Math.floor((i - 1) / 2);
     }
@@ -18,7 +18,7 @@ class Heap {
     let l = i * 2 + 1;
 
     while (l < this.heap.length - 1) {
-      let r = i * 2 + 2 < this.heap.length ? i * 2 + 2 : -1;
+      const r = i * 2 + 2 < this.heap.length ? i * 2 + 2 : -1;
       let swp;
       if (r !== -1 && this.heap[r].f < this.heap[l].f) {
         swp = r;

@@ -1,5 +1,5 @@
 window.onload = () => {
-  const game = new Game(40, 40);
+  const game = new Game(30, 30);
 
   new KeyBindings(game);
 };
@@ -25,7 +25,7 @@ class Game {
     this.grid.getSquare(this.end.row, this.end.col).setEnd();
   }
 
-  move (instant = false) {
+  advance (instant = false) {
     if (this.isGameOver) {
       return;
     }
@@ -47,11 +47,16 @@ class Game {
       neighbor.g = this.calculateManhattanDistance(neighbor.row, neighbor.col, this.start.row, this.start.col);
       neighbor.h = this.calculateManhattanDistance(neighbor.row, neighbor.col, this.end.row, this.end.col);
       neighbor.f = neighbor.g + neighbor.h;
-      neighbor.setParent(this.current.row, this.current.col);
+
+      if (neighbor.parent === null) {
+        neighbor.setParent(this.current.row, this.current.col);
+      }
 
       this.heap.insert(neighbor);
 
-      // View.setText(neighbor.row, neighbor.col, neighbor.f);
+      if (! neighbor.isEnd) {
+        View.setText(neighbor.row, neighbor.col, neighbor.f);
+      }
     }
 
     const nextSquare = this.heap.remove();
@@ -78,7 +83,7 @@ class Game {
     nextSquare.setCurrent();
 
     if (instant) {
-      this.move(true);
+      this.advance(true);
     }
   }
 
@@ -248,10 +253,10 @@ class KeyBindings {
     document.onkeydown = e => {
       switch (e.keyCode) {
         case 65:
-          game.move();
+          game.advance();
           break;
         case 67:
-          game.move(true);
+          game.advance(true);
           break;
         case 82:
           game.reset();
