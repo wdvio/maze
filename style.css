@@ -17,6 +17,8 @@
     width: 1rem;
 }
 
+.open {}
+
 .wall {
     background-color: hsl(40, 5%, 30%);
     border: 1px solid hsl(40, 5%, 30%);

@@ -1,5 +1,5 @@
 window.onload = () => {
-  const game = new Game(30, 30);
+  const game = new Game(30, 60);
 
   new KeyBindings(game);
 };
@@ -15,57 +15,24 @@ class Game {
   reset () {
     this.grid = new Grid(this.h, this.w);
     this.heap = new Heap();
-    this.isGameOver = false;
 
     this.current = { row: 0, col: Math.floor(Math.random(0, 1) * this.w) };
-    this.start = this.current;
+    this.start = { row: this.current.row, col: this.current.col };
     this.end = { row: this.h - 1, col: Math.floor(Math.random(0, 1) * this.w) };
 
-    this.grid.getSquare(this.start.row, this.start.col).setStart();
-    this.grid.getSquare(this.end.row, this.end.col).setEnd();
+    // this.current = { row: 9, col: 0 };
+    // this.start = { row: this.current.row, col: this.current.col };
+    // this.end = { row: this.h - 1, col: this.w - 1 };
+
+    this.grid.getSquare(this.start.row, this.start.col).setAs('start');
+    this.grid.getSquare(this.end.row, this.end.col).setAs('end');
   }
 
   advance (instant = false) {
-    if (this.isGameOver) {
-      return;
-    }
-
     const square = this.grid.getSquare(this.current.row, this.current.col);
 
-    if (! square.isStart) {
-      square.setVisited();
-    }
-
-    const neighbors = this.grid.explore(this.current);
-
-    if (neighbors.length === 0 && this.heap.heap.length === 0) {
-      this.isGameOver = true;
-      return;
-    }
-
-    for (const neighbor of neighbors) {
-      neighbor.g = this.calculateManhattanDistance(neighbor.row, neighbor.col, this.start.row, this.start.col);
-      neighbor.h = this.calculateManhattanDistance(neighbor.row, neighbor.col, this.end.row, this.end.col);
-      neighbor.f = neighbor.g + neighbor.h;
-
-      if (neighbor.parent === null) {
-        neighbor.setParent(this.current.row, this.current.col);
-      }
-
-      this.heap.insert(neighbor);
-
-      if (! neighbor.isEnd) {
-        View.setText(neighbor.row, neighbor.col, neighbor.f);
-      }
-    }
-
-    const nextSquare = this.heap.remove();
-
-    this.current.row = nextSquare.row;
-    this.current.col = nextSquare.col;
-
-    if (nextSquare.isEnd) {
-      let [r, c] = nextSquare.parent;
+    if (square.type === 'end') {
+      let [r, c] = square.parent;
 
       while (this.grid.getSquare(r, c).parent) {
         let curr = this.grid.getSquare(r, c);
@@ -75,16 +42,52 @@ class Game {
         [r, c] = curr.parent;
       }
 
-      this.isGameOver = true;
-
       return;
     }
 
-    nextSquare.setCurrent();
+    if (square.type !== 'start') {
+      square.setAs('visited');
+    }
+
+    for (const neighbor of this.grid.getNeighbors(this.current)) {
+      neighbor.g = this.calculateManhattanDistance(neighbor.row, neighbor.col, this.start.row, this.start.col);
+      neighbor.h = this.calculateManhattanDistance(neighbor.row, neighbor.col, this.end.row, this.end.col);
+
+      // neighbor.g = this.calculateEuclideanDistance(neighbor.row, neighbor.col, this.start.row, this.start.col);
+      // neighbor.h = this.calculateEuclideanDistance(neighbor.row, neighbor.col, this.end.row, this.end.col);
+
+      neighbor.f = neighbor.g + neighbor.h;
+
+      if (neighbor.parent === null) {
+        neighbor.setParent(this.current.row, this.current.col);
+      }
+
+      this.heap.insert(neighbor);
+
+      if (neighbor.type !== 'end') {
+        View.setText(neighbor.row, neighbor.col, neighbor.f);
+      }
+    }
+
+    if (this.heap.heap.length === 0) {
+      return;
+    }
+
+    const nextSquare = this.heap.remove();
+    this.current.row = nextSquare.row;
+    this.current.col = nextSquare.col;
+
+    if (nextSquare.type !== 'end') {
+      nextSquare.setAs('current');
+    }
 
     if (instant) {
       this.advance(true);
     }
+  }
+
+  calculateEuclideanDistance (fromRow, fromCol, toRow, toCol) {
+    return (fromRow - toRow) ** 2 + (fromCol - toCol) ** 2;
   }
 
   calculateManhattanDistance (fromRow, fromCol, toRow, toCol) {
@@ -94,67 +97,35 @@ class Game {
 
 class Square {
   constructor (index, row, col) {
-    this.f = null;
     this.index = index;
-
     this.row = row;
     this.col = col;
 
-    this.isStart = false;
-    this.isEnd = false;
-    this.isWall = false;
-    this.isVisited = false;
-
     this.g = null;
     this.h = null;
+    this.f = null;
     this.parent = null;
+
+    this.setAs('open');
+  }
+
+  setAs (type) {
+    const types = ['open', 'wall', 'start', 'end', 'visited', 'current'];
+
+    if (types.includes(type)) {
+      this.type = type;
+
+      View.setColor(this.row, this.col, type);
+    }
   }
 
   setParent (row, col) {
     this.parent = [row, col];
   }
-
-  setOpen () {
-    this.isWall = false;
-    this.isVisited = false;
-
-    View.setColor(this.row, this.col);
-  }
-
-  setWall () {
-    this.isWall = true;
-
-    View.setColor(this.row, this.col, 'wall');
-  }
-
-  setVisited () {
-    this.isVisited = true;
-
-    View.setColor(this.row, this.col, 'visited');
-  }
-
-  setStart () {
-    this.setOpen();
-    this.isStart = true;
-    this.isVisited = true;
-
-    View.setColor(this.row, this.col, 'start');
-  }
-
-  setEnd () {
-    this.setOpen();
-    this.isEnd = true;
-
-    View.setColor(this.row, this.col, 'end');
-  }
-
-  setCurrent () {
-    View.setColor(this.row, this.col, 'current');
-  }
 }
 
 class Grid {
-  constructor (h, w, saturation = 25) {
+  constructor (h, w, saturation = 35) {
     this.h = h;
     this.w = w;
     this.saturation = saturation;
@@ -163,11 +134,12 @@ class Grid {
 
     this.grid = [];
 
-    this.setOpenSquares();
+    this.generateGrid();
     this.generateRandomWalls();
+    // this.generateHardCodedWalls();
   }
 
-  setOpenSquares () {
+  generateGrid () {
     for (let row = 0; row < this.h; row++) {
       this.grid.push([]);
 
@@ -175,7 +147,6 @@ class Grid {
         const index = (row * this.w) + col;
 
         this.grid[row].push(new Square(index, row, col));
-        this.grid[row][col].setOpen();
       }
     }
   }
@@ -184,13 +155,23 @@ class Grid {
     for (let row = 0; row < this.h; row++) {
       for (let col = 0; col < this.w; col++) {
         if (Math.round(Math.random(0, 1) * 100) < this.saturation) {
-          this.grid[row][col].setWall();
+          this.grid[row][col].setAs('wall');
         }
       }
     }
   }
 
-  explore ({ row, col }) {
+  generateHardCodedWalls () {
+    for (let row = 1; row < this.h - 1; row++) {
+      this.grid[row][9].setAs('wall');
+    }
+
+    for (let row = 1; row < this.h; row++) {
+      this.grid[row][18].setAs('wall');
+    }
+  }
+
+  getNeighbors ({ row, col }) {
     const neighbors = [];
 
     for (let i = 0; i < 4; i++) {
@@ -201,15 +182,9 @@ class Grid {
         continue;
       }
 
-      if (this.grid[newRow][newCol].isWall) {
-        continue;
+      if (['open', 'end'].includes(this.grid[newRow][newCol].type)) {
+        neighbors.push(this.grid[newRow][newCol]);
       }
-
-      if (this.grid[newRow][newCol].isVisited) {
-        continue;
-      }
-
-      neighbors.push(this.grid[newRow][newCol]);
     }
 
     return neighbors;
@@ -242,7 +217,7 @@ class View {
   static setColor (row, col, type) {
     this.ref.childNodes[row].childNodes[col].className = 'node';
 
-    if (type && ['wall', 'start', 'end', 'current', 'visited'].includes(type)) {
+    if (['open', 'wall', 'start', 'end', 'current', 'visited'].includes(type)) {
       this.ref.childNodes[row].childNodes[col].classList.add(type);
     }
   }
