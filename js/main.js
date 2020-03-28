@@ -1,9 +1,9 @@
 const button = document.getElementById('7f6598');
 const theme = localStorage.getItem('theme');
 
-setTimeout(() => {
-  document.getElementById('24e19c').style.display = 'none';
-}, 5000);
+document.getElementById('24e19c').onclick = () => {
+  document.getElementById('3880d9').style.display = 'none';
+}
 
 const themeText = {
   dark: 'Light Mode',

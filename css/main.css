@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;700&display=swap');
+@import 'variables.css';
+@import 'utilities.css';
+
+* {
+    line-height: 12px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: IBM Plex Sans, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    font-size: var(--text-sm);
+    transition: background 250ms ease-in-out,
+        color 500ms ease-in-out;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.notification {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    color: var(--notification-text);
+    background: var(--notification-bg);
+    border-radius: .25rem;
+    border: 1 solid #000;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.05);
+    top: 0;
+    right: 0;
+    margin: 2rem;
+    width: 100%;
+    max-width: 28rem;
+}
+
+.notification > div:first-child {
+    padding-left: 1rem;
+}
+
+.notification > div:first-child > svg {
+    color: var(--gray-6);
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.notification > div:nth-child(2) {
+    flex: 1 1 0%;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-right: 1px solid var(--sidebar-border);
+}
+
+.notification > div:nth-child(3) {
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 700;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.notification > div > h5 {
+    font-size: var(--text-sm);
+    padding: 0;
+    margin: 0;
+    margin-bottom: .6rem;
+}
+
+.notification > div > p {
+    padding: 0;
+    margin: 0;
+}
+
+aside {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 1rem;
+    background: var(--sidebar);
+    justify-content: space-between;
+    border-left: 1px solid var(--sidebar-border);
+}
+
+aside > div {
+    display: flex;
+    flex-direction: column;
+}
+
+aside > div > button {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    align-self: center;
+}
+
+nav {
+    display: flex;
+    flex-direction: column;
+}
+
+nav > a {
+    padding: 0.5rem 1rem 0.5rem 1rem;
+}
+
+nav > .active {
+    color: var(--sidebar-active);
+    background: var(--sidebar-bg-active);
+}
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2rem 0 2rem;
+}
+
+footer > a {
+    margin-right: .5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 5fr 1fr;
+    height: 100vh;
+}
+
+a {
+    color: currentColor;
+    text-decoration: none;
+}
+
+.node {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: var(--text-2xs);
+    font-weight: 300;
+
+    min-height: .9rem;
+    width: .9rem;
+}
+
+.open {
+    background-color: var(--node-bg-open);
+    border: 1px solid var(--node-border-open);
+}
+
+.wall {
+    background-color: var(--node-bg-wall);
+    border: 1px solid var(--node-bg-wall);
+}
+
+.visited {
+    background-color: var(--node-bg-visited);
+    border: 1px solid var(--node-bg-visited);
+}
+
+.current {
+    color: var(--node-text-current);
+    background-color: var(--node-bg-current);
+    border: 1px solid var(--node-bg-current);
+}
+
+.start {
+    background-color: var(--node-bg-start);
+    border: 1px solid var(--node-bg-start);
+}
+
+.end {
+    background-color: var(--node-bg-end);
+    border: 1px solid var(--node-bg-end);
+}

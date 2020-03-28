@@ -233,7 +233,7 @@ class KeyBindings {
         case 67:
           game.advance(true);
           break;
-        case 82:
+        case 32:
           game.reset();
           break;
       }
