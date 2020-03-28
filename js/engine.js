@@ -196,7 +196,7 @@ class Grid {
 }
 
 class View {
-  static ref = document.getElementById('ae01c4af-9296-4976-9a53-c7b881ebd683');
+  static ref = document.getElementById('7d552c');
 
   static renderElements (h, w) {
     this.ref.innerHTML = null;
