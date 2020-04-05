@@ -1,16 +1,18 @@
 const ref = document.getElementById('7d552c');
+
 let grid;
 let priorityQueue;
 
+let cost;
+let tracing;
+
 const h = 40;
 const w = 50;
-const speed = 5;
+const speed = 15;
 
 const c = [];
 const s = [];
 const e = [];
-
-let wp;
 
 window.onload = () => {
   reset();
@@ -27,7 +29,9 @@ function reset () {
 
   generateGrid();
   priorityQueue = new PriorityQueue();
-  wp = {};
+
+  cost = {};
+  tracing = {};
 
   [s[0], s[1]] = [0, Math.floor(Math.random(0, 1) * w)];
   [e[0], e[1]] = [h - 1, Math.floor(Math.random(0, 1) * w)];
@@ -36,48 +40,12 @@ function reset () {
   grid[s[0]][s[1]] = 4;
   grid[e[0]][e[1]] = 5;
 
+  cost[toIndex(c)] = 0;
+  tracing[toIndex(c)] = 0;
+
   render();
 
   advance();
-}
-
-function clearTimeouts () {
-  let id = setTimeout(function() {}, 0);
-
-  while (id--) {
-    clearTimeout(id);
-  }
-}
-
-function advance () {
-  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('current');
-  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('visited');
-
-  if (c[0] === e[0] && c[1] === e[1]) {
-    trace();
-
-    return;
-  }
-
-  for (const p of explore(c)) {
-    const d = manhattan(p, s) + manhattan(p, e);
-
-    grid[p[0]][p[1]] = 2;
-
-    wp[toIndex(p)] = toIndex(c);
-
-    priorityQueue.push({ p, d });
-  }
-
-  if (priorityQueue.length === 0) {
-    return;
-  }
-
-  [c[0], c[1]] = priorityQueue.pop().p;
-
-  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('current');
-
-  setTimeout(() => advance(), speed);
 }
 
 function generateGrid () {
@@ -97,6 +65,39 @@ function generateGrid () {
   }
 };
 
+function advance () {
+  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('current');
+  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('visited');
+
+  if (c[0] === e[0] && c[1] === e[1]) {
+    trace();
+
+    return;
+  }
+
+  for (const p of explore(c)) {
+    const newCost = cost[toIndex(c)] + 1;
+
+    if (! cost.hasOwnProperty(toIndex(p)) || newCost < cost[toIndex(p)]) {
+      cost[toIndex(p)] = newCost;
+
+      priorityQueue.push({ p, d: newCost + manhattan(p, e) });
+      
+      tracing[toIndex(p)] = toIndex(c);
+    }
+  }
+
+  if (priorityQueue.length === 0) {
+    return;
+  }
+
+  [c[0], c[1]] = priorityQueue.pop().p;
+
+  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('current');
+
+  setTimeout(() => advance(), speed);
+}
+
 function explore ([r, c]) {
   const arr = [];
 
@@ -115,9 +116,10 @@ function explore ([r, c]) {
 }
 
 function trace () {
-  [c[0], c[1]] = toCoordinates(wp[toIndex(c)]);
+  const i = toIndex(c);
+  [c[0], c[1]] = toCoordinates(tracing[i]);
 
-  if (isNaN(c[0])) {
+  if (tracing[i] === toIndex(s)) {
     return;
   }
 
@@ -155,5 +157,13 @@ function render () {
         el.appendChild(Object.assign(document.createElement('div'), { className: 'node end' }));
       }
     }
+  }
+}
+
+function clearTimeouts () {
+  let id = setTimeout(function() {}, 0);
+
+  while (id--) {
+    clearTimeout(id);
   }
 }

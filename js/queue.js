@@ -1,5 +1,5 @@
 class PriorityQueue {
-  constructor (data = [], compare = defaultCompare) {
+  constructor (data = [], compare = (a, b) => a.d - b.d) {
     this.data = data;
     this.length = this.data.length;
     this.compare = compare;
@@ -74,8 +74,4 @@ class PriorityQueue {
 
     data[pos] = item;
   }
-}
-
-function defaultCompare (a, b) {
-  return a.d - b.d
 }
