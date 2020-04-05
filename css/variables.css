@@ -30,6 +30,9 @@
     --bg: var(--white);
     --text: var(--black);
 
+    --text-trivial: var(--gray-4);
+    --text-muted: var(--gray-5);
+
     --sidebar: var(--gray-8);
     --sidebar-border: var(--gray-7);
     --sidebar-bg-active: var(--gray-7);
@@ -51,6 +54,9 @@
 .dark {
     --bg: var(--black);
     --text: var(--white);
+
+    --text-trivial: var(--gray-5);
+    --text-muted: var(--gray-3);
 
     --sidebar: var(--gray-1);
     --sidebar-border: var(--gray-1);
