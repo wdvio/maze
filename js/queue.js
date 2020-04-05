@@ -78,5 +78,4 @@ class PriorityQueue {
 
 function defaultCompare (a, b) {
   return a.d - b.d
-  // return a < b ? -1 : a > b ? 1 : 0;
 }
