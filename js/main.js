@@ -65,7 +65,7 @@ function generateGrid () {
 
 function advance () {
   ref.childNodes[cur.row].childNodes[cur.col].classList.toggle('current');
-  ref.childNodes[cur.row].childNodes[cur.col].classList.toggle('visited');
+  ref.childNodes[cur.row].childNodes[cur.col].classList.add('visited');
 
   if (cur.row === end.row && cur.col === end.col) {
     trace();
