@@ -1,24 +1,22 @@
-const ref = document.getElementById('7d552c');
+var ref = document.getElementById('7d552c');
 
-let grid;
-let priorityQueue;
+var grid;
+var queue;
+var costs;
+var tracing;
 
-let cost;
-let tracing;
+var h = 40;
+var w = 50;
 
-const h = 40;
-const w = 50;
-const speed = 15;
-
-const c = [];
-const s = [];
-const e = [];
+var beg = {};
+var end = {};
+var cur = {};
 
 window.onload = () => {
   reset();
 
-  document.onkeydown = e => {
-    if (e.keyCode === 82) {
+  document.onkeydown = event => {
+    if (event.keyCode === 82) {
       reset();
     }
   };
@@ -28,20 +26,21 @@ function reset () {
   clearTimeouts();
 
   generateGrid();
-  priorityQueue = new PriorityQueue();
+  queue = new PriorityQueue();
 
-  cost = {};
+  costs = {};
   tracing = {};
 
-  [s[0], s[1]] = [0, Math.floor(Math.random(0, 1) * w)];
-  [e[0], e[1]] = [h - 1, Math.floor(Math.random(0, 1) * w)];
-  [c[0], c[1]] = [s[0], s[1]];
+  [beg.row, beg.col] = [0, Math.floor(Math.random(0, 1) * w)];
+  [end.row, end.col] = [h - 1, Math.floor(Math.random(0, 1) * w)];
 
-  grid[s[0]][s[1]] = 4;
-  grid[e[0]][e[1]] = 5;
+  cur = beg;
 
-  cost[toIndex(c)] = 0;
-  tracing[toIndex(c)] = 0;
+  grid[beg.row][beg.col] = 4;
+  grid[end.row][end.col] = 5;
+
+  costs[toIndex(cur)] = 0;
+  tracing[toIndex(cur)] = 0;
 
   render();
 
@@ -49,14 +48,13 @@ function reset () {
 }
 
 function generateGrid () {
-  const t = 7;
   grid = [];
 
-  for (let row = 0; row < h; row++) {
+  for (var row = 0; row < h; row++) {
     grid.push([]);
 
-    for (let col = 0; col < w; col++) {
-      if (Math.round(Math.random(0, 1) * 10) > t) {
+    for (var col = 0; col < w; col++) {
+      if (Math.round(Math.random(0, 1) * 10) > 7) {
         grid[row].push(1);
       } else {
         grid[row].push(0);
@@ -66,87 +64,87 @@ function generateGrid () {
 };
 
 function advance () {
-  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('current');
-  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('visited');
+  ref.childNodes[cur.row].childNodes[cur.col].classList.toggle('current');
+  ref.childNodes[cur.row].childNodes[cur.col].classList.toggle('visited');
 
-  if (c[0] === e[0] && c[1] === e[1]) {
+  if (cur.row === end.row && cur.col === end.col) {
     trace();
 
     return;
   }
 
-  for (const p of explore(c)) {
-    const newCost = cost[toIndex(c)] + 1;
+  for (var next of explore(cur)) {
+    var newCost = costs[toIndex(cur)] + 1;
 
-    if (! cost.hasOwnProperty(toIndex(p)) || newCost < cost[toIndex(p)]) {
-      cost[toIndex(p)] = newCost;
+    if (! costs.hasOwnProperty(toIndex(next)) || newCost < costs[toIndex(next)]) {
+      costs[toIndex(next)] = newCost;
 
-      priorityQueue.push({ p, d: newCost + manhattan(p, e) });
-      
-      tracing[toIndex(p)] = toIndex(c);
+      queue.push({ next, d: newCost + manhattan(next, end) });
+
+      tracing[toIndex(next)] = toIndex(cur);
     }
   }
 
-  if (priorityQueue.length === 0) {
+  if (queue.length === 0) {
     return;
   }
 
-  [c[0], c[1]] = priorityQueue.pop().p;
+  cur = queue.pop().next;
 
-  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('current');
+  ref.childNodes[cur.row].childNodes[cur.col].classList.toggle('current');
 
-  setTimeout(() => advance(), speed);
+  setTimeout(() => advance(), 1);
 }
 
-function explore ([r, c]) {
-  const arr = [];
+function explore ({ row, col }) {
+  var arr = [];
 
-  for (let i = 0; i < 4; i++) {
-    const rr = r + [-1, 0, 1, 0][i];
-    const cc = c + [0, 1, 0, -1][i];
+  for (var i = 0; i < 4; i++) {
+    var rr = row + [-1, 0, 1, 0][i];
+    var cc = col + [0, 1, 0, -1][i];
 
     if (rr < 0 || cc < 0 || rr >= h || cc >= w || ! [0, 5].includes(grid[rr][cc])) {
       continue;
     }
 
-    arr.push([rr, cc]);
+    arr.push({ row: rr, col: cc });
   }
 
   return arr;
 }
 
 function trace () {
-  const i = toIndex(c);
-  [c[0], c[1]] = toCoordinates(tracing[i]);
+  var i = toIndex(cur);
+  [cur.row, cur.col] = toCoordinates(tracing[i]);
 
-  if (tracing[i] === toIndex(s)) {
+  if (tracing[i] === toIndex(beg)) {
     return;
   }
 
-  ref.childNodes[c[0]].childNodes[c[1]].classList.toggle('current');
+  ref.childNodes[cur.row].childNodes[cur.col].classList.toggle('current');
 
-  setTimeout(() => trace(), speed);
+  setTimeout(() => trace(), 25);
 }
 
-function toIndex ([r, c]) {
-  return (r * w) + c;
+function toIndex ({ row, col }) {
+  return (row * w) + col;
 }
 
-function toCoordinates (i) {
-  return [Math.floor(i / w), i % w];
+function toCoordinates (index) {
+  return [Math.floor(index / w), index % w];
 }
 
-function manhattan ([r1, c1], [r2, c2]) {
+function manhattan ({ row: r1, col: c1 }, { row: r2, col: c2 }) {
   return Math.abs(r1 - r2) + Math.abs(c1 - c2);
 }
 
 function render () {
   ref.innerHTML = null;
 
-  for (let i = 0; i < h; i++) {
-    const el = ref.appendChild(Object.assign(document.createElement('div'), { className: 'flex justify-between' }));
+  for (var i = 0; i < h; i++) {
+    var el = ref.appendChild(Object.assign(document.createElement('div'), { className: 'flex justify-between' }));
 
-    for (let j = 0; j < w; j++) {
+    for (var j = 0; j < w; j++) {
       if (grid[i][j] === 0) {
         el.appendChild(Object.assign(document.createElement('div'), { className: 'node open' }));
       } else if (grid[i][j] === 1) {
@@ -161,7 +159,7 @@ function render () {
 }
 
 function clearTimeouts () {
-  let id = setTimeout(function() {}, 0);
+  var id = setTimeout(() => {}, 0);
 
   while (id--) {
     clearTimeout(id);
